@@ -1,0 +1,55 @@
+{
+  "_image-editor-4X5RCX2j.css": {
+    "file": "assets/image-editor-4X5RCX2j.css",
+    "src": "_image-editor-4X5RCX2j.css"
+  },
+  "_image-editor-DqlcYm-u.js": {
+    "file": "assets/image-editor-DqlcYm-u.js",
+    "name": "image-editor",
+    "imports": [
+      "_rolldown-runtime-S-ySWqyJ.js"
+    ],
+    "css": [
+      "assets/image-editor-4X5RCX2j.css"
+    ]
+  },
+  "_rolldown-runtime-S-ySWqyJ.js": {
+    "file": "assets/rolldown-runtime-S-ySWqyJ.js",
+    "name": "rolldown-runtime"
+  },
+  "_vendor-DTneBV5B.js": {
+    "file": "assets/vendor-DTneBV5B.js",
+    "name": "vendor"
+  },
+  "components/preview/ImageEditor.vue": {
+    "file": "assets/ImageEditor-BYus8IMo.js",
+    "name": "ImageEditor",
+    "src": "components/preview/ImageEditor.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.ts",
+      "_rolldown-runtime-S-ySWqyJ.js",
+      "_image-editor-DqlcYm-u.js",
+      "_vendor-DTneBV5B.js"
+    ],
+    "css": [
+      "assets/ImageEditor-B6ZNQcIx.css"
+    ]
+  },
+  "main.ts": {
+    "file": "assets/index-PP1WYhpn.js",
+    "name": "index",
+    "src": "main.ts",
+    "isEntry": true,
+    "imports": [
+      "_rolldown-runtime-S-ySWqyJ.js",
+      "_vendor-DTneBV5B.js"
+    ],
+    "dynamicImports": [
+      "components/preview/ImageEditor.vue"
+    ],
+    "css": [
+      "assets/index-CuQCF119.css"
+    ]
+  }
+}

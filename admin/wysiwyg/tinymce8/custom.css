@@ -1,0 +1,271 @@
+/* Elegant TinyMCE 8 skin overrides — aligned with admin08 design tokens.
+   Loaded after oxide skin.min.css. */
+
+.tox.tox-tinymce {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05) !important;
+  overflow: hidden;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+/* Hide Chrome's native blue focus outline on iframe */
+.tox .tox-edit-area iframe,
+.tox .tox-edit-area iframe:focus,
+.tox .tox-edit-area iframe:focus-visible {
+  outline: none !important;
+  border: none !important;
+}
+/* Focus indicator jen na edit area (ne na celém editoru) — jemné šedé glow */
+.tox .tox-edit-area::before {
+  border: 1px solid rgba(148, 163, 184, .55) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 10px 2px rgba(148, 163, 184, .4) !important;
+  transition: opacity .2s ease !important;
+}
+.tox.tox-edit-focus .tox-edit-area::before {
+  opacity: 1 !important;
+}
+
+/* Toolbar container */
+.tox .tox-editor-header {
+  background: #ffffff !important;
+  padding: 0 !important;
+}
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar-overlord {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+.tox .tox-toolbar__group {
+  padding: 4px 8px;
+  border-right: 1px solid #edf1f7 !important;
+}
+.tox .tox-toolbar__group:last-child {
+  border-right: none !important;
+}
+
+/* Buttons */
+.tox .tox-tbtn {
+  width: 30px !important;
+  height: 30px !important;
+  margin: 3px 1px !important;
+  border-radius: 6px !important;
+  color: #1e293b !important;
+  background: transparent !important;
+  font-size: 14px !important;
+  transition: background-color .12s ease, color .12s ease;
+}
+.tox .tox-tbtn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+.tox .tox-tbtn:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, .35);
+  outline-offset: 1px;
+}
+.tox .tox-tbtn--enabled,
+.tox .tox-tbtn--enabled:hover {
+  background: #dbeafe !important;
+  color: #2563eb !important;
+}
+.tox .tox-tbtn svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+/* Lucide (outlined) icons: preserve fill=none, stroke uses currentColor.
+   Applies to icons anywhere — toolbar, dialogs, menus. */
+.tox svg[stroke] {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+.tox svg[stroke] *:not([fill]) {
+  fill: none !important;
+}
+.tox svg[stroke] *:not([stroke="none"]) {
+  stroke: currentColor;
+}
+/* Default (solid) icons: fill uses currentColor */
+.tox .tox-tbtn svg:not([stroke]) {
+  fill: currentColor;
+}
+/* Naked icon buttons (like dialog "browse" button) — neutral text color */
+.tox .tox-button--naked.tox-button--icon,
+.tox .tox-browse-url {
+  color: #1e293b !important;
+}
+.tox .tox-button--naked.tox-button--icon:hover,
+.tox .tox-browse-url:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+.tox .tox-tbtn--select {
+  width: auto !important;
+  padding: 0 8px !important;
+}
+
+/* Dropdown chevrons */
+.tox .tox-split-button {
+  border-radius: 6px !important;
+  margin: 3px 1px !important;
+  background: transparent !important;
+  transition: background-color .12s ease;
+}
+.tox .tox-split-button:hover {
+  background: #f1f5f9 !important;
+}
+.tox .tox-split-button > .tox-tbtn {
+  background: transparent !important;
+}
+.tox .tox-split-button__chevron {
+  width: 14px !important;
+}
+.tox .tox-tbtn__select-chevron {
+  width: 16px !important;
+  padding-left: 2px;
+  opacity: .6;
+}
+.tox .tox-tbtn__select-chevron svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke-width: 2 !important;
+}
+.tox .tox-tbtn--select {
+  gap: 2px;
+}
+.tox .tox-tbtn--active {
+  background: transparent !important;
+}
+
+/* Statusbar */
+.tox .tox-statusbar {
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  height: 28px !important;
+}
+.tox .tox-statusbar a,
+.tox .tox-statusbar__path-item {
+  color: #64748b;
+}
+.tox .tox-statusbar__branding { display: none; }
+
+/* Menus & dialogs */
+.tox .tox-menu,
+.tox .tox-dialog,
+.tox .tox-dialog__header,
+.tox .tox-dialog__footer {
+  border-radius: 10px !important;
+  border-color: #e2e8f0 !important;
+}
+.tox .tox-menu {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .12) !important;
+  padding: 4px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.tox .tox-collection__item {
+  border-radius: 6px !important;
+  padding: 6px 10px !important;
+}
+.tox .tox-collection__item-icon {
+  width: 20px !important;
+  height: 20px !important;
+}
+.tox .tox-collection__item-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.tox .tox-collection__group {
+  border-bottom-color: #f1f5f9 !important;
+}
+.tox .tox-dialog {
+  box-shadow: 0 20px 40px rgba(15, 23, 42, .15);
+  overflow: hidden;
+}
+.tox .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+.tox .tox-collection__item--enabled {
+  color: #2563eb;
+}
+
+/* Floating toolbar (quickbars, context, overflow) */
+.tox .tox-toolbar__overflow {
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .12) !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+.tox .tox-pop__dialog {
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .12) !important;
+  background: #fff !important;
+  /* no overflow:hidden — would clip the arrow ::before/::after */
+}
+.tox .tox-pop__dialog .tox-toolbar,
+.tox .tox-pop__dialog .tox-toolbar__primary {
+  background: #fff !important;
+  border: none !important;
+}
+.tox .tox-pop__dialog .tox-toolbar__group {
+  padding: 2px 6px !important;
+}
+
+/* Sticky toolbar shadow accent */
+.tox.tox-tinymce--toolbar-sticky-on .tox-editor-header {
+  box-shadow: 0 1px 0 #e2e8f0;
+}
+
+/* Dialog inputs */
+.tox .tox-textfield,
+.tox .tox-textarea,
+.tox .tox-listbox,
+.tox .tox-toolbar-textfield {
+  border-radius: 6px !important;
+  border-color: #cbd5e1 !important;
+  padding: 6px 12px !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: #334155 !important;
+  background: #ffffff !important;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.tox .tox-listbox__select-label,
+.tox .tox-label,
+.tox .tox-toolbar-label {
+  padding: 0 8px 2px 0 !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+}
+.tox .tox-listbox__select-chevron {
+  width: 16px !important;
+  height: 16px !important;
+}
+.tox .tox-listbox__select-chevron svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #1e293b !important;
+}
+.tox .tox-textfield:focus,
+.tox .tox-textarea:focus,
+.tox .tox-listbox:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+/* Primary button in dialogs */
+.tox .tox-button {
+  border-radius: 6px;
+}
+.tox .tox-button:not(.tox-button--secondary):not(.tox-button--naked) {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+.tox .tox-button:not(.tox-button--secondary):not(.tox-button--naked):hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}

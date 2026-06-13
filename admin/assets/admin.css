@@ -1,0 +1,141 @@
+:root{--primary:#6753AE;--primary-dark:#3B2D83;--accent:#f59e0b;--bg:#f6f4fb;--panel:#fff;--border:#e6e2f0;--text:#1f2937;--heading:#15131D;--muted:#6b7280;--radius:12px;--shadow:0 6px 22px rgba(59,45,131,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#131019;--panel:#1c1827;--border:#2c2640;--text:#d9d4e6;--heading:#f3f0fa;--muted:#8d86a3}}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 'Segoe UI Variable Text','Segoe UI',system-ui,sans-serif}
+a{color:var(--primary)}
+a:hover{color:var(--primary-dark)}
+@media(prefers-color-scheme:dark){a:hover{color:#a99ce0}}
+
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+main.wrap{padding-bottom:56px}
+.form-actions{margin-bottom:8px}
+
+/* ---------- topbar ---------- */
+.topbar{background:linear-gradient(120deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:var(--shadow)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.brand{display:flex;align-items:baseline;gap:10px;color:#fff;text-decoration:none}
+.brand strong{font-size:19px;letter-spacing:.2px}
+.brand span{font-size:13px;opacity:.75}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs a{color:rgba(255,255,255,.85);text-decoration:none;font-size:14px;padding:8px 14px;border-radius:8px;transition:background .15s,color .15s}
+.tabs a:hover{background:rgba(255,255,255,.12);color:#fff}
+.tabs a.active{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
+
+/* ---------- obsah ---------- */
+.page-title{color:var(--heading);font-size:24px;margin:26px 0 18px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin:0 0 20px}
+.panel h2{color:var(--heading);font-size:17px;margin:0 0 14px}
+.panel-tools{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* ---------- flash ---------- */
+.flash{margin:20px 0 0;padding:12px 16px;border-radius:8px;font-size:14px;border:1px solid transparent}
+.flash-ok{background:#e8f7ee;border-color:#b7e4c7;color:#14532d}
+.flash-err{background:#fdebec;border-color:#f5b9bd;color:#7f1d1d}
+@media(prefers-color-scheme:dark){
+.flash-ok{background:#10291a;border-color:#1d4a2e;color:#9be5b6}
+.flash-err{background:#2e1417;border-color:#5c2329;color:#f2a8ad}
+}
+
+/* ---------- tabulky ---------- */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:hover{background:rgba(103,83,174,.05)}
+@media(prefers-color-scheme:dark){tbody tr:hover{background:rgba(103,83,174,.12)}}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.actions{text-align:right;white-space:nowrap}
+
+/* ---------- formuláře ---------- */
+label{display:block;font-size:13px;font-weight:600;color:var(--heading);margin:0 0 5px}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search],input[type=datetime-local],select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font:inherit;font-size:14px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:-1px}
+textarea{min-height:120px;resize:vertical}
+.field{margin:0 0 16px}
+.field-row{display:flex;gap:14px;flex-wrap:wrap}
+.field-row .field{flex:1;min-width:180px;margin-bottom:16px}
+.field-inline{display:flex;gap:8px;align-items:center}
+.field-inline input{flex:1}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:400;color:var(--text);margin:0}
+.check input{width:auto}
+.checks{display:flex;gap:24px;flex-wrap:wrap;padding:6px 0}
+.form-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+
+/* ---------- tlačítka ---------- */
+.btn{display:inline-block;background:linear-gradient(120deg,var(--primary),var(--primary-dark));color:#fff;border:0;border-radius:8px;padding:9px 18px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:filter .15s,transform .05s}
+.btn:hover{filter:brightness(1.12);color:#fff}
+.btn:active{transform:translateY(1px)}
+.btn-ghost{background:transparent;color:var(--primary);border:1px solid var(--border)}
+.btn-ghost:hover{filter:none;background:rgba(103,83,174,.08);color:var(--primary-dark)}
+@media(prefers-color-scheme:dark){.btn-ghost{color:#b3a7e6}.btn-ghost:hover{color:#cfc6f2}}
+.btn-danger{background:#b42334}
+.btn-danger:hover{filter:brightness(1.15)}
+.btn-sm{padding:6px 12px;font-size:13px}
+
+/* ---------- badge ---------- */
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:99px;vertical-align:middle}
+.badge-draft{background:var(--accent);color:#3b2a03}
+.badge-closed{background:var(--border);color:var(--muted)}
+
+/* ---------- stránkování ---------- */
+.pager{display:flex;align-items:center;gap:12px;justify-content:center;margin:18px 0;font-size:14px}
+.pager a{display:inline-block;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel);text-decoration:none}
+.pager a:hover{border-color:var(--primary)}
+.pager .pager-info{color:var(--muted)}
+
+/* ---------- přihlašovací karta ---------- */
+.auth-card{max-width:420px;margin:48px auto}
+.auth-card .panel{padding:28px}
+.auth-links{text-align:center;font-size:14px;margin-top:14px}
+.cf-turnstile{margin:0 0 16px}
+
+/* ---------- komentáře ---------- */
+.comment{border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);box-shadow:var(--shadow);margin:0 0 14px;overflow:hidden}
+.comment-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(103,83,174,.05);font-size:13px}
+@media(prefers-color-scheme:dark){.comment-head{background:rgba(103,83,174,.12)}}
+.comment-head .author{font-weight:700;color:var(--heading)}
+.comment-head form{margin-left:auto}
+.comment-body{padding:6px 16px;overflow-wrap:anywhere}
+.comment-body img{max-width:100%;height:auto}
+
+/* ---------- kategorie ---------- */
+.group-head{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:0 0 14px}
+.group-head .field{margin:0}
+.group-head .f-name{flex:2;min-width:180px}
+.group-head .f-short{flex:1.4;min-width:140px}
+.group-head .f-slug{flex:1.4;min-width:140px}
+.group-head .f-sort{width:84px}
+.cat-grid{border-top:1px solid var(--border)}
+.cat-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border)}
+.cat-row:hover{background:rgba(103,83,174,.04)}
+.cat-row .c-name{flex:1.4;min-width:150px}
+.cat-row .c-slug{flex:1.2;min-width:130px}
+.cat-row .c-desc{flex:2;min-width:170px}
+.cat-row .c-group{flex:1.2;min-width:140px}
+.cat-row .c-count{width:84px;text-align:right;font-size:13px;color:var(--muted);white-space:nowrap}
+.cat-head{display:flex;gap:10px;padding:4px 0;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+
+/* ---------- editor článku ---------- */
+.tox-tinymce{border-radius:8px!important;border-color:var(--border)!important}
+
+/* ---------- responsivita ---------- */
+@media(max-width:720px){
+  .topbar-in{justify-content:center;text-align:center}
+  .panel{padding:16px}
+  .page-title{font-size:21px}
+  table{font-size:13px}
+  th,td{padding:7px 6px}
+  .cat-row .c-count{width:auto}
+}
+
+/* TinyMCE overrides */
+.tox .tox-toolbar { justify-content: center !important; text-align: center !important; }
+.tox-dialog__header { display: none !important; }
+.tox-dialog__body { padding-top: 5px !important; }
+.tox .tox-button--icon .tox-icon svg, .tox .tox-button.tox-button--icon .tox-icon svg, .tox .tox-button.tox-button--secondary.tox-button--icon .tox-icon svg { fill: black !important; }
+.tox .tox-button--secondary { background-color: #bbb !important; color: white !important; }
+.tox .tox-button { color: white !important; }
+.tox .tox-tbtn__select-label, .tox .tox-listbox__select-label { color: black !important; }

@@ -1,0 +1,37 @@
+{
+    "name": "rfm/fileimagemanager",
+    "description": "File Image Manager - Modern PHP 8.3+ / Vue 3 file manager",
+    "type": "project",
+    "license": "CC0-1.0",
+    "authors": [
+        {
+            "name": "Radek Hulán",
+            "homepage": "https://mywebdesign.dev/"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-fileinfo": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "RFM\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RFM\\Tests\\": "tests/php/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

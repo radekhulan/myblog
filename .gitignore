@@ -1,0 +1,21 @@
+.vscode/
+.claude/
+.source/
+CLAUDE.md
+
+# lokální konfigurace se secrets (na produkci vytvoř z cfg.sample.php)
+cfg.php
+
+# dočasné soubory
+*.tmp
+
+# logy (prázdný adresář v repu zůstává přes .gitkeep)
+log/*
+!log/.gitkeep
+
+# obrázková data webů (na produkci nakopíruj fyzicky do images/{doména}/{media,img,tmp})
+images/
+
+# osobní foto autora a OG náhled CV (cesty se nastavují v cfg.php → SITE_AUTHOR/CV_PROFILE)
+assets/RadekHulan.webp
+assets/og/radekhulan.png

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MyAndroid.cz">
+  <defs>
+    <linearGradient id="ma-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6753AE"/>
+      <stop offset="1" stop-color="#3B2D83"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="url(#ma-bg)"/>
+  <path d="M14 46 V18 L24 18 L32 34 L40 18 L50 18 V46 H43 V28 L34 44 L30 44 L21 28 V46 Z" fill="#FFFFFF"/>
+  <circle cx="50" cy="14" r="9" fill="#FFFFFF"/>
+  <path d="M44.8 16.2 C44.8 13.4 47.1 11.2 50 11.2 C52.9 11.2 55.2 13.4 55.2 16.2 Z" fill="#3B2D83"/>
+  <line x1="46.6" y1="11.8" x2="45.2" y2="9.4" stroke="#3B2D83" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="53.4" y1="11.8" x2="54.8" y2="9.4" stroke="#3B2D83" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="47.8" cy="14" r="0.9" fill="#FFFFFF"/>
+  <circle cx="52.2" cy="14" r="0.9" fill="#FFFFFF"/>
+</svg>

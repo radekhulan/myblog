@@ -1,0 +1,64 @@
+# MyBlog — Apache ekvivalent web.config (IIS).
+# Vyžaduje mod_rewrite a mod_headers. Na IIS se použije web.config, tento soubor se ignoruje.
+
+Options -Indexes
+DirectoryIndex index.php
+
+# ---------- bezpečnostní hlavičky ----------
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set Content-Security-Policy "default-src 'self' https: data:; img-src 'self' https: data: https://i.ytimg.com; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://challenges.cloudflare.com https:; media-src 'self' https:; base-uri 'self'; upgrade-insecure-requests"
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ---------- blokace citlivých cest (ekvivalent hiddenSegments) ----------
+    RewriteRule ^(lib|log|vendor|templates|pages|install)(/|$) - [F,L]
+    RewriteRule (^|/)\.(git|source) - [F,L]
+    RewriteRule ^cfg\.php$ - [F,L]
+    RewriteRule \.log$ - [F,L]
+    RewriteRule ^media/uploader/ - [F,L]
+
+    # ---------- www → bez www ----------
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # ---------- HTTP → HTTPS ----------
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+    # ---------- per-doména favicon → assets/logo/{accent}.ico ----------
+    RewriteCond %{HTTP_HOST} ^(?:www\.|dev\.)?([^.]+)\.
+    RewriteRule ^favicon\.ico$ assets/logo/%1.ico [L]
+
+    # ---------- sitemap / robots ----------
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    RewriteRule ^sitemap\.txt$ /sitemap.xml [R=301,L]
+    RewriteRule ^robots\.txt$ robots.php [L]
+
+    # ---------- per-doména média ----------
+    # Jakýkoli soubor s příponou (kromě /assets, /admin a skutečných souborů v rootu)
+    # se čte z images/{doména}/... — pokryje media, img, tmp, article, video, download…
+    RewriteCond %{REQUEST_URI} !^/(assets|admin)/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{HTTP_HOST} ^(?:www\.|dev\.)?(.+?)(?::\d+)?$
+    RewriteRule ^(.+\.[A-Za-z0-9]{1,8})$ images/%1/$1 [L]
+
+    # ---------- front controller (kromě /admin a existujících souborů) ----------
+    RewriteCond %{REQUEST_URI} !^/admin(/|$)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ---------- 404 → front controller (vrátí stylovou 404 stránku) ----------
+ErrorDocument 404 /index.php
