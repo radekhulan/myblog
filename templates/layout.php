@@ -59,7 +59,7 @@ $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="/assets/css/site.css?v=20">
+<link rel="stylesheet" href="/assets/css/site.css?v=21">
 </head>
 <body>
 <div class="topline">
