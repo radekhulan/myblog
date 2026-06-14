@@ -78,6 +78,9 @@ function cat_slug(int $catid): ?string
 
 /* ---------- fotogalerie: cesty k souborům (struktura starého webu) ---------- */
 
+/** Řazení fotek v albu: ruční pořadí (oporadi) má přednost, NULL padá zpět na oid. */
+const GALLERY_PHOTO_ORDER = '(oporadi IS NULL), oporadi, oid';
+
 function foto_dir(int $id): int
 {
     return intdiv($id, 1000);

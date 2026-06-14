@@ -165,10 +165,13 @@ function admin_page(string $title, string $contentHtml): void
         $tabs = [
             ['/admin/',                'Články',    in_array($script, ['index.php', 'article.php', 'comments.php'], true)],
             ['/admin/categories.php',  'Kategorie', $script === 'categories.php'],
-            ['/admin/password.php',    'Heslo',     $script === 'password.php'],
-            ['/',                      'Zobrazit web ↗', false],
-            ['/admin/logout.php',      'Odhlásit',  false],
         ];
+        if (has_gallery()) {
+            $tabs[] = ['/admin/gallery.php', 'Fotogalerie', in_array($script, ['gallery.php', 'album.php'], true)];
+        }
+        $tabs[] = ['/admin/password.php',    'Heslo',     $script === 'password.php'];
+        $tabs[] = ['/',                      'Zobrazit web ↗', false];
+        $tabs[] = ['/admin/logout.php',      'Odhlásit',  false];
         $nav = '<nav class="tabs">';
         foreach ($tabs as [$href, $label, $active]) {
             $nav .= '<a href="' . e($href) . '"' . ($active ? ' class="active"' : '') . '>' . e($label) . '</a>';
@@ -204,6 +207,17 @@ function admin_page(string $title, string $contentHtml): void
 <h1 class="page-title">' . e($title) . '</h1>
 ' . $contentHtml . '
 </main>
+<script>
+/* Spolehlivé potvrzení akcí: prvek s atributem data-confirm se před kliknutím zeptá.
+   Hodnotu čte getAttribute (ne JS string), takže ji nerozbije žádný znak v textu. */
+document.addEventListener("click", function (e) {
+  var el = e.target.closest("[data-confirm]");
+  if (el && !window.confirm(el.getAttribute("data-confirm"))) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+}, true);
+</script>
 </body>
 </html>';
     exit;

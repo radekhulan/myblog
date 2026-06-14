@@ -1,11 +1,37 @@
-# File Image Manager (PHP 8.5, Vue 3, TypeScript, TinyMCE)
+# File & Image Manager (PHP 8.5, Vue 3, TypeScript, TinyMCE)
 
 Modern, responsive web file manager built with **Vue 3 + TypeScript** frontend and **PHP 8.5** backend. Supports light/dark themes, drag & drop uploads, image editing (Filerobot), and integration with TinyMCE 8 / CKEditor 5. Includes a ready-to-use TinyMCE plugin. No database required.
 
 Developed by **[Radek Hulán](https://mywebdesign.dev/)**
 with the amazing assistance of [Claude Code](https://claude.ai/claude-code).
 
-**[Quick Start (Deploy)](#quick-start)** | **[What to Deploy](#what-to-deploy)** | **[Security](#security)** | **[Configuration](#configuration)** | **[Editor Integration](#editor-integration)**
+> [!TIP]
+> **Want TinyMCE wired up in one command?** The companion bundle
+> **[TinyMCE with integrated modern File & Image Manager](https://github.com/radekhulan/tinymce-imagemanager)**
+> downloads TinyMCE 8 (GPL) + all language packs, this File & Image Manager, and a custom Lucide
+> icon pack — and wires them together (toolbar button, file picker **and drag & drop**) with a
+> single setup script. No Composer, no npm build.
+
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Docker](#docker)
+- [Security](#security)
+- [Requirements](#requirements)
+- [Configuration](#configuration)
+- [Editor Integration](#editor-integration)
+- [Web Server Configuration](#web-server-configuration)
+- [Production Deployment](#production-deployment)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Available Languages](#available-languages)
+- [Development](#development)
+- [Testing](#testing)
+- [API Reference](#api-reference)
+- [Project Structure](#project-structure)
+- [Building Distribution Package](#building-distribution-package)
+- [Technology Stack](#technology-stack)
+- [License](#license)
 
 ---
 
@@ -13,11 +39,13 @@ with the amazing assistance of [Claude Code](https://claude.ai/claude-code).
 
 ### Browsing & Navigation
 - **Three view modes** — Grid (thumbnails), List (detailed rows), and Columns
+- **Directory sidebar** — collapsible tree with lazy-loaded folders, auto-expands to current path
 - **Breadcrumb navigation** with one-click access to any parent folder
 - **Sort** by name, date, or size (ascending / descending)
 - **Real-time search** with instant filtering as you type
 - **Type filters** — show only images, videos, audio, documents, or archives
 - **Remembers last folder** across sessions
+- **Optimized for large directories** — pagination and progressive rendering for 1 000+ files
 
 ### File Operations
 - **Upload** files via drag & drop, file picker, or paste from URL
@@ -34,7 +62,8 @@ with the amazing assistance of [Claude Code](https://claude.ai/claude-code).
 - **Images** — full-size preview with click-to-zoom
 - **Video & Audio** — HTML5 player with playback controls
 - **Text / Code** — syntax-colored preview
-- **PDF & Office documents** — Google Docs Viewer integration
+- **PDF** — native browser PDF viewer (no external service)
+- **Office documents** — Google Docs Viewer integration
 
 ### Image Editor
 - Built-in **Filerobot Image Editor** for JPG, PNG, and WebP
@@ -71,6 +100,9 @@ with the amazing assistance of [Claude Code](https://claude.ai/claude-code).
 ### Dark Theme
 ![Dark Theme](media/source/Theme-Dark.webp)
 
+### Folder View
+![Folder View](media/source/FolderView.webp)
+
 ### Light Theme
 ![Light Theme](media/source/Theme-Light.webp)
 
@@ -99,6 +131,54 @@ mkdir -p media/source media/thumbs
 chmod 755 media/source media/thumbs
 # Point your web server document root to the public/ directory
 ```
+
+---
+
+## Docker
+
+Run File & Image Manager in a Docker container with PHP 8.4-FPM + Nginx. No need to install PHP, Composer, or Node.js on your machine.
+
+### Quick Start
+
+```bash
+# PowerShell
+.\docker\build.ps1 -Run
+
+# Bash / Linux / macOS
+./docker/build.sh --run
+
+# Docker Compose
+docker compose up -d
+```
+
+The app will be available at **http://localhost:8080**.
+
+### Media Files
+
+Uploaded files are bind-mounted to the local `media/` folder, so they persist across container restarts and are directly accessible on the host.
+
+### Configuration
+
+Mount your own config file as read-only:
+
+```bash
+docker run -p 8080:80 \
+    -v ./media:/var/www/html/media \
+    -v ./config/filemanager.php:/var/www/html/config/filemanager.php:ro \
+    fileimagemanager
+```
+
+### PHP Limits (defaults in image)
+
+| Parameter | Value |
+|-----------|-------|
+| `upload_max_filesize` | 64 MB |
+| `post_max_size` | 64 MB |
+| `memory_limit` | 256 MB |
+| `max_execution_time` | 120 s |
+| `client_max_body_size` (Nginx) | 64 MB |
+
+See [`docker/README.md`](docker/README.md) for full Docker documentation.
 
 ---
 
@@ -141,7 +221,7 @@ The backend validates all paths using `realpath()`. Never bypass these checks.
 
 | Component | Version |
 |-----------|---------|
-| PHP | >= 8.5 (`gd`, `mbstring`, `json`, `curl`, `fileinfo`) |
+| PHP | >= 8.4 (`gd`, `mbstring`, `json`, `curl`, `fileinfo`) |
 | Composer | 2.x |
 | Node.js | >= 20 (build only) |
 | npm | >= 10 (build only) |
@@ -172,6 +252,25 @@ All options are in `config/filemanager.php` with inline documentation.
 | `mime_extension_rename` | `true` | Auto-rename extensions based on MIME type |
 | `filePermission` | `0644` | Default file permissions (Linux) |
 | `folderPermission` | `0755` | Default folder permissions (Linux) |
+
+### Drag & drop upload (TinyMCE)
+
+Used by the bundled TinyMCE plugin when images are dropped straight onto the editor (see [TinyMCE 8 (Plugin)](#tinymce-8-plugin)).
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `dragdrop_upload` | `true` | Master switch for drag & drop upload from the editor |
+| `dragdrop_path` | `cms/{YYYY}/{MM}/{DD}` | Target folder under the upload root for dropped images |
+
+`dragdrop_path` supports date placeholders, which are created automatically on demand:
+
+| Placeholder | Meaning | Placeholder | Meaning |
+|---|---|---|---|
+| `{YYYY}` | Year (4 digits) | `{DD}` | Day (01–31) |
+| `{YY}` | Year (2 digits) | `{HH}` | Hour (00–23) |
+| `{MM}` | Month (01–12) | `{mm}` | Minute (00–59) |
+
+Examples: `cms/{YYYY}/{MM}/{DD}`, `{YY}{MM}`, `uploads`. Each editor can opt out via `fileimagemanager_dragdrop: false`. The endpoint reuses the standard upload pipeline (extension blacklist, MIME check, size limits) and **ignores any client-supplied path** — the destination is taken only from this config.
 
 ### Permissions
 
@@ -216,6 +315,10 @@ All options are in `config/filemanager.php` with inline documentation.
 | `image_resizing_width` | `0` | Resize width |
 | `image_resizing_height` | `0` | Resize height |
 | `image_resizing_mode` | `auto` | `auto`, `exact`, `portrait`, `landscape`, `crop` |
+| `image_quality_jpeg` | `90` | JPEG quality (0–100) for saves, conversions, and thumbnails |
+| `image_quality_webp` | `90` | WebP quality (0–100) for saves, conversions, and thumbnails |
+| `default_image_format` | `''` | Default format in the upload dialog: `''` (don't change), `'jpeg'`, or `'webp'` |
+| `upload_resize_options` | `['1000x1000', '1600x1600', '2400x2400']` | Preset "max size" choices in the upload dialog. Each entry is `WxH` — the image is resized to fit (aspect ratio preserved). Empty array hides the dropdown. |
 | `image_watermark` | `false` | Path to watermark image or `false` |
 | `image_editor_active` | `true` | Enable Filerobot image editor |
 
@@ -233,11 +336,11 @@ All options are in `config/filemanager.php` with inline documentation.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `googledoc_enabled` | `true` | Use Google Docs Viewer for office files |
-| `googledoc_file_exts` | `doc, docx, xls, xlsx, ppt, pptx, pdf, odt, odp, ods` | Extensions to preview via Google |
+| `googledoc_enabled` | `false` | Use Google Docs Viewer for office files |
+| `googledoc_file_exts` | `doc, docx, xls, xlsx, ppt, pptx, odt, odp, ods` | Extensions to preview via Google |
 
 > [!NOTE]
-> Google Docs Viewer requires the file to be **publicly accessible** from the internet. It will not work on localhost or intranet servers.
+> PDF files are previewed using the native browser PDF viewer (works offline). Google Docs Viewer is used only for office documents and requires the file to be **publicly accessible** from the internet.
 
 ---
 
@@ -273,11 +376,13 @@ tinymce.init({
 | `fileimagemanager_url` | auto-detected | File manager URL (e.g. `/public/`) |
 | `fileimagemanager_crossdomain` | `false` | Enable cross-domain postMessage mode |
 | `fileimagemanager_title` | `File Image Manager` | Dialog title |
+| `fileimagemanager_dragdrop` | `true` | Drop images straight onto the editor to upload them (per editor) |
 
 **Behavior:**
 
 - **Toolbar button** (`fileimagemanager`): opens the file manager dialog. Clicking a file inserts it into the editor.
 - **Image/media/link dialogs**: the browse button in TinyMCE native dialogs opens the file manager via `file_picker_callback`.
+- **Drag & drop upload**: drop one or more image files straight onto the editor and they are uploaded without opening the file manager. A small window then shows their thumbnails so you can insert each one — as a **preview linked to the full image** (`<a href="full"><img src="thumb"></a>`) or as the **full image** (`<img>`). Works with multiple editors on one page; disable it per editor with `fileimagemanager_dragdrop: false`. The target folder and the master switch are set server-side — see [`dragdrop_upload` / `dragdrop_path`](#drag--drop-upload-tinymce) in the configuration.
 - **Smart insertion**: if text or an image is selected in the editor, the chosen file is inserted as a link (`<a>`) wrapping the selection. Without selection, images insert as `<img>`, videos as `<video>`, audio as `<audio>`, and other files as `<a>` links.
 - **Preview**: the eye icon on file hover always shows a preview, even in editor mode.
 - **Relative URLs**: absolute URLs from the file manager are automatically converted to relative paths.
@@ -433,7 +538,7 @@ server {
     }
 
     location ~ \.php$ {
-        fastcgi_pass unix:/run/php/php8.5-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
     }
@@ -599,11 +704,12 @@ All endpoints return JSON. Prefix: `/api/`
 ### Files & Folders
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/files` | List directory contents |
+| `GET` | `/api/files` | List directory contents (paginated) |
 | `GET` | `/api/files/info` | Get file info |
 | `GET` | `/api/files/download` | Download file (range requests supported) |
 | `GET` | `/api/files/preview` | Get preview data |
 | `GET` | `/api/files/content` | Get text file content |
+| `GET` | `/api/folders/tree` | Get recursive directory tree |
 | `POST` | `/api/folders/create` | Create folder |
 | `POST` | `/api/folders/rename` | Rename folder |
 | `POST` | `/api/folders/delete` | Delete folder |
@@ -643,8 +749,8 @@ All endpoints return JSON. Prefix: `/api/`
 │   ├── components/               #   Vue components
 │   │   ├── common/               #     ContextMenu, LoadingOverlay
 │   │   ├── dialogs/              #     Confirm, Prompt, Alert, Chmod, TextEditor, Language
-│   │   ├── file-list/            #     FileGrid, FileList, FileColumns, FileItem
-│   │   ├── layout/               #     AppHeader, Breadcrumb, SortBar, StatusBar
+│   │   ├── file-list/            #     FileGrid, FileList, FileColumns, FileItem, FileIconSprite
+│   │   ├── layout/               #     AppHeader, Breadcrumb, SortBar, StatusBar, DirectorySidebar
 │   │   ├── preview/              #     ImagePreview, MediaPlayer, TextPreview, ImageEditor
 │   │   └── upload/               #     UploadPanel, DropZone, UploadProgress, UrlUpload
 │   ├── composables/              #   useKeyboard, useDragDrop
@@ -695,9 +801,9 @@ The script runs the full frontend build, installs production-only Composer depen
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Vue 3.5, TypeScript, Vite 7, Tailwind CSS 4, Pinia 2.3 |
-| Image Editor | Filerobot Image Editor 4.8 |
-| Backend | PHP 8.5, GD library |
+| Frontend | Vue 3.5, TypeScript, Vite 8, Tailwind CSS 4, Pinia 3.0 |
+| Image Editor | Filerobot Image Editor 5.0 |
+| Backend | PHP 8.4+, GD library |
 | Storage | Filesystem only (no database) |
 
 ### Image Editor

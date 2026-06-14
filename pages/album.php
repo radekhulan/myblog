@@ -17,7 +17,7 @@ $catid = (int) $album['fkategorie'];
 $fotky = all(
     'SELECT oid, onazev, onahled, osoubor FROM ' . tbl('foto_fotka') . '
      WHERE fid = ? AND otyp = 0
-     ORDER BY oid ASC',
+     ORDER BY ' . GALLERY_PHOTO_ORDER,
     [$albumId]
 );
 

@@ -1,5 +1,11 @@
 {
     "_language_name": "Čeština",
+    "DragDrop_uploaded": "Nahrané obrázky",
+    "DragDrop_insert_preview": "Vložit náhled",
+    "DragDrop_insert_image": "Vložit obrázek",
+    "DragDrop_insert_link": "Vložit odkaz",
+    "DragDrop_close": "Zavřít",
+    "DragDrop_delete": "Smazat",
     "View": "Zobrazit",
     "Select": "Vybrat",
     "Deselect_All": "Zrušit vše",

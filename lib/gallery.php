@@ -18,7 +18,7 @@ function gallery_albums(array $catIds, int $offset, int $limit): array
          LEFT JOIN ' . tbl('foto_fotka') . ' fo ON fo.oid = (
              SELECT oid FROM ' . tbl('foto_fotka') . '
              WHERE fid = f.fid AND otyp = 0
-             ORDER BY ohodnoceni DESC, oid ASC
+             ORDER BY ohodnoceni DESC, ' . GALLERY_PHOTO_ORDER . '
              LIMIT 1
          )
          WHERE f.fkategorie IN (' . $in . ') AND f.ffotek > 0

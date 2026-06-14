@@ -211,7 +211,7 @@ function render_album_embed(int $fid, int $num): string
     $catid = (int) $album['fkategorie'];
     $fotky = all(
         'SELECT oid, onazev, onahled, osoubor FROM ' . tbl('foto_fotka')
-        . ' WHERE fid = ? ORDER BY ohodnoceni DESC, oid ASC LIMIT ' . max(1, $num),
+        . ' WHERE fid = ? ORDER BY ohodnoceni DESC, ' . GALLERY_PHOTO_ORDER . ' LIMIT ' . max(1, $num),
         [$fid]
     );
     if (!$fotky) {

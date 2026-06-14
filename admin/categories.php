@@ -104,6 +104,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 flash_set('err', 'Kategorie nebyla nalezena.');
             } elseif ((int) scalar('SELECT COUNT(*) FROM ' . tbl('item') . ' WHERE icat = ?', [$catId]) > 0) {
                 flash_set('err', 'Kategorii nelze smazat — obsahuje články.');
+            } elseif (has_gallery() && (int) scalar('SELECT COUNT(*) FROM ' . tbl('foto') . ' WHERE fkategorie = ?', [$catId]) > 0) {
+                flash_set('err', 'Kategorii nelze smazat — obsahuje fotoalba.');
             } else {
                 exec_q('DELETE FROM ' . tbl('category') . ' WHERE catid = ?', [$catId]);
                 flash_set('ok', 'Kategorie „' . title_text($cat['cname']) . '" byla smazána.');
@@ -140,8 +142,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
 /* ---------- data pro výpis ---------- */
 $groups = all('SELECT * FROM ' . tbl('subcategory') . ' WHERE blogid = ? ORDER BY subsort, name', [$blogId]);
+$albCntExpr = has_gallery()
+    ? '(SELECT COUNT(*) FROM ' . tbl('foto') . ' f WHERE f.fkategorie = c.catid)'
+    : '0';
 $cats   = all(
-    'SELECT c.*, (SELECT COUNT(*) FROM ' . tbl('item') . ' i WHERE i.icat = c.catid) AS cnt'
+    'SELECT c.*, (SELECT COUNT(*) FROM ' . tbl('item') . ' i WHERE i.icat = c.catid) AS cnt,'
+    . ' ' . $albCntExpr . ' AS acnt'
     . ' FROM ' . tbl('category') . ' c WHERE c.cblog = ? ORDER BY c.csort, c.cname',
     [$blogId]
 );
@@ -170,15 +176,30 @@ function group_select(string $name, array $groups, int $selected): string
     return $out . '</select>';
 }
 
+/** Hlavička sloupců nad výpisem kategorií. */
+function cat_head(): string
+{
+    return '<div class="cat-head">'
+        . '<span class="c-name">Název</span>'
+        . '<span class="c-slug">Slug</span>'
+        . '<span class="c-desc">Popis</span>'
+        . '<span class="c-group">Skupina</span>'
+        . '<span class="c-count">Obsah</span>'
+        . '<span class="c-act">Akce</span>'
+        . '</div>';
+}
+
 /** Jeden řádek kategorie (inline edit + mazání). */
 function cat_row(array $c, array $groups, int $blogId): string
 {
-    $catId = (int) $c['catid'];
-    $cnt   = (int) $c['cnt'];
+    $catId   = (int) $c['catid'];
+    $cnt     = (int) $c['cnt'];
+    $acnt    = (int) ($c['acnt'] ?? 0);
+    $formId  = 'catsave-' . $catId;
     ob_start();
     ?>
     <div class="cat-row">
-      <form method="post" action="/admin/categories.php" style="display:contents">
+      <form id="<?= $formId ?>" method="post" action="/admin/categories.php" style="display:contents">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="cat_save">
         <input type="hidden" name="blog" value="<?= $blogId ?>">
@@ -187,18 +208,20 @@ function cat_row(array $c, array $groups, int $blogId): string
         <span class="c-slug"><input type="text" name="iurltitle" value="<?= e($c['iurltitle'] ?? '') ?>" maxlength="40" title="Slug" placeholder="slug (auto)"></span>
         <span class="c-desc"><input type="text" name="cdesc" value="<?= e(title_text($c['cdesc'] ?? '')) ?>" maxlength="200" title="Popis" placeholder="popis"></span>
         <span class="c-group"><?= group_select('cgroup', $groups, (int) ($c['cgroup'] ?? 0)) ?></span>
-        <span class="c-count"><?= $cnt ?>&nbsp;čl.</span>
-        <button type="submit" class="btn btn-ghost btn-sm">Uložit</button>
+        <span class="c-count"><?= $cnt ?>&nbsp;čl.<?php if ($acnt > 0): ?> · <?= $acnt ?>&nbsp;alb<?php endif; ?></span>
       </form>
-      <?php if ($cnt === 0): ?>
-      <form method="post" action="/admin/categories.php" onsubmit="return confirm('Opravdu smazat kategorii „<?= e(title_text($c['cname'])) ?>"?');">
-        <?= csrf_field() ?>
-        <input type="hidden" name="action" value="cat_delete">
-        <input type="hidden" name="blog" value="<?= $blogId ?>">
-        <input type="hidden" name="catid" value="<?= $catId ?>">
-        <button type="submit" class="btn btn-danger btn-sm">Smazat</button>
-      </form>
-      <?php endif; ?>
+      <span class="c-act">
+        <button type="submit" form="<?= $formId ?>" class="btn btn-ghost btn-sm">Uložit</button>
+        <?php if ($cnt === 0 && $acnt === 0): ?>
+        <form method="post" action="/admin/categories.php" style="display:inline">
+          <?= csrf_field() ?>
+          <input type="hidden" name="action" value="cat_delete">
+          <input type="hidden" name="blog" value="<?= $blogId ?>">
+          <input type="hidden" name="catid" value="<?= $catId ?>">
+          <button type="submit" class="btn btn-danger btn-sm" data-confirm="Opravdu smazat kategorii „<?= e(title_text($c['cname'])) ?>“?">Smazat</button>
+        </form>
+        <?php endif; ?>
+      </span>
     </div>
     <?php
     return ob_get_clean();
@@ -245,18 +268,19 @@ ob_start();
         <button type="submit" class="btn btn-ghost btn-sm">Uložit</button>
       </form>
       <?php if (!$groupCats): ?>
-      <form method="post" action="/admin/categories.php" onsubmit="return confirm('Opravdu smazat skupinu „<?= e(title_text($g['name'])) ?>"?');">
+      <form method="post" action="/admin/categories.php">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="group_delete">
         <input type="hidden" name="blog" value="<?= $blogId ?>">
         <input type="hidden" name="groupid" value="<?= $groupId ?>">
-        <button type="submit" class="btn btn-danger btn-sm">Smazat</button>
+        <button type="submit" class="btn btn-danger btn-sm" data-confirm="Opravdu smazat skupinu „<?= e(title_text($g['name'])) ?>“?">Smazat</button>
       </form>
       <?php endif; ?>
     </div>
 
     <?php if ($groupCats): ?>
       <div class="cat-grid">
+        <?= cat_head() ?>
         <?php foreach ($groupCats as $c) { echo cat_row($c, $groups, $blogId); } ?>
       </div>
     <?php else: ?>
@@ -269,6 +293,7 @@ ob_start();
   <div class="panel">
     <h2>Nezařazené kategorie <span class="muted small">(skupina neexistuje — přesuňte je do platné skupiny)</span></h2>
     <div class="cat-grid">
+      <?= cat_head() ?>
       <?php foreach ($orphans as $c) { echo cat_row($c, $groups, $blogId); } ?>
     </div>
   </div>

@@ -7,6 +7,7 @@ require_login();
 $p    = max(1, (int) ($_GET['p'] ?? 1));
 $s    = trim((string) ($_GET['s'] ?? ''));
 $blog = (int) ($_GET['blog'] ?? 0);
+$cat  = (int) ($_GET['cat'] ?? 0);
 
 $where  = [];
 $params = [];
@@ -17,6 +18,10 @@ if ($s !== '') {
 if ($blog > 0) {
     $where[]  = 'i.iblog = ?';
     $params[] = $blog;
+}
+if ($cat > 0) {
+    $where[]  = 'i.icat = ?';
+    $params[] = $cat;
 }
 $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
 
@@ -38,12 +43,29 @@ $rows = all(
 
 $blogs = all('SELECT bnumber, bname, bshortname FROM ' . tbl('blog') . ' ORDER BY bnumber');
 
-function index_url(int $page, string $s, int $blog): string
+/* Kategorie pro filtr — seskupené do optgroup dle blogu. */
+$catRows = all(
+    'SELECT c.catid, c.cname, c.cblog, b.bname'
+    . ' FROM ' . tbl('category') . ' c'
+    . ' LEFT JOIN ' . tbl('blog') . ' b ON b.bnumber = c.cblog'
+    . ' ORDER BY c.cblog, c.csort, c.cname'
+);
+$catGroups = [];
+foreach ($catRows as $r) {
+    $bid = (int) $r['cblog'];
+    if (!isset($catGroups[$bid])) {
+        $catGroups[$bid] = ['label' => title_text($r['bname'] ?? ('Blog ' . $bid)), 'cats' => []];
+    }
+    $catGroups[$bid]['cats'][] = $r;
+}
+
+function index_url(int $page, string $s, int $blog, int $cat): string
 {
     $qs = http_build_query(array_filter([
         'p'    => $page > 1 ? $page : null,
         's'    => $s !== '' ? $s : null,
         'blog' => $blog > 0 ? $blog : null,
+        'cat'  => $cat > 0 ? $cat : null,
     ]));
     return '/admin/' . ($qs !== '' ? '?' . $qs : '');
 }
@@ -56,7 +78,7 @@ ob_start();
       <label for="s">Hledat v titulku</label>
       <input type="search" id="s" name="s" value="<?= e($s) ?>" placeholder="Hledaný výraz…">
     </div>
-    <div class="field" style="flex:1;min-width:160px;margin:0">
+    <div class="field" style="flex:1;min-width:150px;margin:0">
       <label for="blog">Blog</label>
       <select id="blog" name="blog">
         <option value="0">— všechny blogy —</option>
@@ -64,6 +86,19 @@ ob_start();
           <option value="<?= (int) $b['bnumber'] ?>"<?= $blog === (int) $b['bnumber'] ? ' selected' : '' ?>>
             <?= e(title_text($b['bname'])) ?> (<?= e($b['bshortname']) ?>)
           </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="field" style="flex:1;min-width:160px;margin:0">
+      <label for="cat">Kategorie</label>
+      <select id="cat" name="cat">
+        <option value="0">— všechny kategorie —</option>
+        <?php foreach ($catGroups as $g): ?>
+          <optgroup label="<?= e($g['label']) ?>">
+            <?php foreach ($g['cats'] as $c): ?>
+              <option value="<?= (int) $c['catid'] ?>"<?= $cat === (int) $c['catid'] ? ' selected' : '' ?>><?= e(title_text($c['cname'])) ?></option>
+            <?php endforeach; ?>
+          </optgroup>
         <?php endforeach; ?>
       </select>
     </div>
@@ -110,9 +145,9 @@ ob_start();
 
 <?php if ($pages > 1): ?>
 <div class="pager">
-  <?php if ($p > 1): ?><a href="<?= e(index_url($p - 1, $s, $blog)) ?>">&laquo; Předchozí</a><?php endif; ?>
+  <?php if ($p > 1): ?><a href="<?= e(index_url($p - 1, $s, $blog, $cat)) ?>">&laquo; Předchozí</a><?php endif; ?>
   <span class="pager-info">strana <?= $p ?> z <?= $pages ?></span>
-  <?php if ($p < $pages): ?><a href="<?= e(index_url($p + 1, $s, $blog)) ?>">Další &raquo;</a><?php endif; ?>
+  <?php if ($p < $pages): ?><a href="<?= e(index_url($p + 1, $s, $blog, $cat)) ?>">Další &raquo;</a><?php endif; ?>
 </div>
 <?php endif; ?>
 <?php

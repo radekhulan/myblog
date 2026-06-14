@@ -269,3 +269,16 @@
   background: #1d4ed8;
   border-color: #1d4ed8;
 }
+
+/* ───────────────────────────────────────────────────────────────
+   Extra overrides (TinyMCE with modern File & Image Manager)
+   ─────────────────────────────────────────────────────────────── */
+.tox .tox-toolbar { justify-content: center !important; text-align: center !important; }
+.tox-dialog__header { display: none !important; }
+.tox-dialog__body { padding-top: 5px !important; }
+.tox .tox-button--icon .tox-icon svg,
+.tox .tox-button.tox-button--icon .tox-icon svg,
+.tox .tox-button.tox-button--secondary.tox-button--icon .tox-icon svg { fill: black !important; }
+.tox .tox-button--secondary { background-color: #bbb !important; color: white !important; }
+.tox .tox-button { color: white !important; }
+.tox .tox-tbtn__select-label, .tox .tox-listbox__select-label { color: black !important; }

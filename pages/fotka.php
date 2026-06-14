@@ -16,14 +16,14 @@ $fid = (int) $fotka['fid'];
 $album = one('SELECT fid, fnazev, fkategorie FROM ' . tbl('foto') . ' WHERE fid = ?', [$fid]);
 $catid = $album ? (int) $album['fkategorie'] : null;
 
-$prev = one(
-    'SELECT oid FROM ' . tbl('foto_fotka') . ' WHERE fid = ? AND otyp = 0 AND oid < ? ORDER BY oid DESC LIMIT 1',
-    [$fid, $fotkaId]
+// Sousedé dle pořadí v albu (respektuje ruční oporadi, ne jen oid).
+$orderedOids = array_map(
+    static fn(array $r): int => (int) $r['oid'],
+    all('SELECT oid FROM ' . tbl('foto_fotka') . ' WHERE fid = ? AND otyp = 0 ORDER BY ' . GALLERY_PHOTO_ORDER, [$fid])
 );
-$next = one(
-    'SELECT oid FROM ' . tbl('foto_fotka') . ' WHERE fid = ? AND otyp = 0 AND oid > ? ORDER BY oid ASC LIMIT 1',
-    [$fid, $fotkaId]
-);
+$pos  = array_search($fotkaId, $orderedOids, true);
+$prev = ($pos !== false && $pos > 0) ? $orderedOids[$pos - 1] : null;
+$next = ($pos !== false && $pos < count($orderedOids) - 1) ? $orderedOids[$pos + 1] : null;
 
 $ogImage = cfg('canonical_base') . foto_medium_url($fotkaId, $fotka['onahled']);
 
@@ -31,8 +31,8 @@ $content = view('gallery-foto', [
     'fotka' => $fotka,
     'album' => $album,
     'catid' => $catid,
-    'prev'  => $prev ? (int) $prev['oid'] : null,
-    'next'  => $next ? (int) $next['oid'] : null,
+    'prev'  => $prev,
+    'next'  => $next,
 ]);
 
 echo view('layout', [

@@ -1,5 +1,11 @@
 {
     "_language_name": "Français",
+    "DragDrop_uploaded": "Images téléversées",
+    "DragDrop_insert_preview": "Insérer l’aperçu",
+    "DragDrop_insert_image": "Insérer l’image",
+    "DragDrop_insert_link": "Insérer le lien",
+    "DragDrop_close": "Fermer",
+    "DragDrop_delete": "Supprimer",
     "View": "Afficher",
     "Select": "Sélectionner",
     "Deselect_All": "Tout désélectionner",

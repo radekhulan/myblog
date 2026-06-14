@@ -6,7 +6,7 @@ namespace RFM\Service;
 
 use RFM\Config\AppConfig;
 use RFM\Enum\ImageResizeMode;
-use RFM\Exception\{UploadException, InvalidExtensionException};
+use RFM\Exception\{UploadException, InvalidExtensionException, FileNotFoundException};
 
 class UploadService
 {
@@ -52,6 +52,138 @@ class UploadService
         }
 
         return $results;
+    }
+
+    /**
+     * Handle a drag & drop upload coming from the TinyMCE plugin.
+     *
+     * Resolves the configured target path (with date placeholders), creates it on
+     * demand, stores the files, and returns each result enriched with the full
+     * image URL and a (213x160) thumbnail URL so the editor can offer both.
+     *
+     * Paths use forward slashes throughout: currentPath is normalised to "/" in
+     * AppConfig, PHP accepts "/" on Windows, and the relative path doubles as a URL.
+     *
+     * @return array{name: string, path: string, size: int, type: string, url: string, isImage: bool, thumbUrl: ?string}[]
+     */
+    public function handleDragDropUpload(array $files): array
+    {
+        if (!$this->config->dragDropUpload) {
+            throw new UploadException('Drag & drop upload is disabled');
+        }
+
+        $targetDir = $this->resolveDragDropDir();
+        $targetPath = $this->config->currentPath . $targetDir;
+
+        if (
+            !is_dir($targetPath)
+            && !@mkdir($targetPath, $this->config->folderPermission, true)
+            && !is_dir($targetPath)
+        ) {
+            throw new UploadException('Failed to create upload directory');
+        }
+
+        // handleUpload() validates the path is inside the upload root and processes the files.
+        $results = $this->handleUpload($targetDir, $files);
+
+        foreach ($results as &$result) {
+            $result['url'] = $this->config->uploadDir . $result['path'];
+            $ext = mb_strtolower(pathinfo($result['path'], PATHINFO_EXTENSION));
+            $isImage = $this->security->isImageExtension($ext);
+            $result['isImage'] = $isImage;
+            // Images get a thumbnail (for the picker + the "preview" insert); other files
+            // (PDF, …) have no thumbnail and are inserted as a link.
+            $result['thumbUrl'] = $isImage ? $this->thumbnails->getThumbnailUrl($result['path']) : null;
+        }
+        unset($result);
+
+        return $results;
+    }
+
+    /**
+     * Delete a file (and its thumbnail) that was previously stored via drag & drop.
+     *
+     * Used by the TinyMCE plugin's "remove" button so the user can discard an image
+     * they just dropped. Deletion is restricted to the configured drag & drop base
+     * directory (the static part of dragDropPath before any {date} token) on top of
+     * the usual upload-root containment check — so it can only ever remove files this
+     * feature created, never arbitrary files elsewhere in the upload root.
+     */
+    public function handleDragDropDelete(string $relativePath): void
+    {
+        if (!$this->config->dragDropUpload) {
+            throw new UploadException('Drag & drop upload is disabled');
+        }
+
+        $relativePath = str_replace('\\', '/', $relativePath);
+        $relativePath = preg_replace('#\.\.+#', '', $relativePath); // neutralise ".." traversal
+        $relativePath = ltrim($relativePath, '/');
+
+        if ($relativePath === '') {
+            throw new UploadException('File path required');
+        }
+
+        // Defense in depth: only allow deleting inside the drag & drop base folder.
+        $base = $this->dragDropBaseDir();
+        if ($base !== '' && !str_starts_with($relativePath . '/', $base . '/')) {
+            throw new UploadException('Path is outside the drag & drop directory');
+        }
+
+        $fullPath = $this->config->currentPath . $relativePath;
+        $this->security->validatePath($fullPath);
+
+        if (!is_file($fullPath)) {
+            throw new FileNotFoundException("File not found: {$relativePath}");
+        }
+
+        @unlink($fullPath);
+        $this->thumbnails->deleteThumbnail($relativePath);
+    }
+
+    /**
+     * The static prefix of dragDropPath (everything before the first {date} token),
+     * sanitised the same way resolveDragDropDir() sanitises paths. Returns '' when
+     * the path starts with a token (no static prefix to anchor on).
+     */
+    private function dragDropBaseDir(): string
+    {
+        $path = $this->config->dragDropPath;
+        $pos = strpos($path, '{');
+        if ($pos !== false) {
+            $path = substr($path, 0, $pos);
+        }
+
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#\.\.+#', '', $path);
+        $path = preg_replace('#[^A-Za-z0-9_./-]#', '', $path);
+        $path = preg_replace('#/+#', '/', $path);
+
+        return trim($path, '/');
+    }
+
+    /**
+     * Resolve the configured drag & drop target directory, expanding date
+     * placeholders and stripping anything that could escape the upload root.
+     * Returns a relative path with a trailing slash, or '' for the root.
+     */
+    private function resolveDragDropDir(): string
+    {
+        $path = strtr($this->config->dragDropPath, [
+            '{YYYY}' => date('Y'),
+            '{YY}'   => date('y'),
+            '{MM}'   => date('m'),
+            '{DD}'   => date('d'),
+            '{HH}'   => date('H'),
+            '{mm}'   => date('i'),
+        ]);
+
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#\.\.+#', '', $path);            // neutralise ".." traversal
+        $path = preg_replace('#[^A-Za-z0-9_./-]#', '', $path); // allow only safe characters
+        $path = preg_replace('#/+#', '/', $path);              // collapse repeated slashes
+        $path = trim($path, '/');
+
+        return $path === '' ? '' : $path . '/';
     }
 
     /**

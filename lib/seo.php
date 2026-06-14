@@ -24,7 +24,7 @@ function first_image_url(array $item): ?string
     if (preg_match('/\%album\((\d+)/i', $html, $m)) {
         $foto = one(
             'SELECT oid, onahled FROM ' . tbl('foto_fotka')
-            . ' WHERE fid = ? ORDER BY ohodnoceni DESC, oid ASC LIMIT 1',
+            . ' WHERE fid = ? ORDER BY ohodnoceni DESC, ' . GALLERY_PHOTO_ORDER . ' LIMIT 1',
             [(int) $m[1]]
         );
         if ($foto) {
