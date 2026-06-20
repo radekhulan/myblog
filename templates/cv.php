@@ -63,6 +63,26 @@
   </div>
   <?php endif; ?>
 
+  <?php if (!empty($cv['repos'])): $ghUser = $cv['github_user'] ?? '';
+      $cvRepos = $cv['repos'];
+      usort($cvRepos, function ($a, $b) use ($ghLive) {
+          $sa = $ghLive[strtolower($a['name'])] ?? $a['stars'];
+          $sb = $ghLive[strtolower($b['name'])] ?? $b['stars'];
+          return (int) $sb <=> (int) $sa;
+      }); ?>
+  <h2 class="cv-section-title">Open source na GitHubu</h2>
+  <div class="cv-grid">
+    <?php foreach ($cvRepos as $repo):
+        $stars = $ghLive[strtolower($repo['name'])] ?? $repo['stars']; ?>
+    <a class="cv-card cv-repo" href="https://github.com/<?= e($ghUser) ?>/<?= e($repo['name']) ?>" rel="noopener">
+      <span class="cv-icon cv-icon-gh"><?= cv_icon('github') ?></span>
+      <span class="cv-card-text"><strong><?= e($repo['name']) ?></strong><span><?= e($repo['desc']) ?></span></span>
+      <span class="cv-stars" title="<?= (int) $stars ?> hvězdiček na GitHubu">★ <?= (int) $stars ?></span>
+    </a>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+
   <?php if (!empty($cv['socials'])): ?>
   <h2 class="cv-section-title">Sociální sítě</h2>
   <div class="cv-grid cv-grid-socials">
@@ -70,20 +90,6 @@
     <a class="cv-card cv-soc cv-soc-<?= e($s['icon']) ?>" href="<?= e($s['url']) ?>" rel="me noopener">
       <span class="cv-icon"><?= cv_icon($s['icon']) ?></span>
       <span class="cv-card-text"><strong><?= e($s['label']) ?></strong><span><?= e($s['sub']) ?></span></span>
-    </a>
-    <?php endforeach; ?>
-  </div>
-  <?php endif; ?>
-
-  <?php if (!empty($cv['repos'])): $ghUser = $cv['github_user'] ?? ''; ?>
-  <h2 class="cv-section-title">Open source na GitHubu</h2>
-  <div class="cv-grid">
-    <?php foreach ($cv['repos'] as $repo):
-        $stars = $ghLive[strtolower($repo['name'])] ?? $repo['stars']; ?>
-    <a class="cv-card cv-repo" href="https://github.com/<?= e($ghUser) ?>/<?= e($repo['name']) ?>" rel="noopener">
-      <span class="cv-icon cv-icon-gh"><?= cv_icon('github') ?></span>
-      <span class="cv-card-text"><strong><?= e($repo['name']) ?></strong><span><?= e($repo['desc']) ?></span></span>
-      <span class="cv-stars" title="<?= (int) $stars ?> hvězdiček na GitHubu">★ <?= (int) $stars ?></span>
     </a>
     <?php endforeach; ?>
   </div>
