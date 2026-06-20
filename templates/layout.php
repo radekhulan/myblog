@@ -62,6 +62,7 @@ $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 <link rel="stylesheet" href="/assets/css/site.css?v=26">
 </head>
 <body>
+<?php if (!$cvOnly): ?>
 <div class="topline">
   <div class="container topline-row">
     <nav class="site-switch" aria-label="Rodina webů">
@@ -95,6 +96,7 @@ $reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
     <?php endif; ?>
   </div>
 </div>
+<?php endif; ?>
 
 <header class="site-header<?= $cvOnly ? ' site-header-cv' : '' ?>">
   <div class="container header-row">
