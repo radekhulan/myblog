@@ -653,8 +653,21 @@ pre .tok-tag { color: #93c5fd; }
 }
 .cv-grid-projects .cv-icon { background: var(--accent-soft); }
 .cv-grid-projects .cv-card-text strong { color: var(--accent); }
-.cv-section-motto { margin: -8px 0 14px; color: var(--muted); font-style: italic; }
+.cv-section-motto { margin: -8px 0 12px; color: var(--muted); font-style: italic; }
 .cv-section-motto b { color: var(--accent); font-style: normal; font-weight: 700; }
+.cv-section-intro {
+  max-width: 600px; margin: 26px auto 6px; padding: 0;
+  font-size: 15px; line-height: 1.78; color: var(--muted);
+  text-align: center; letter-spacing: .002em; position: relative;
+}
+.cv-section-intro::before {
+  content: ""; display: block; width: 46px; height: 2px; margin: 0 auto 18px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: .8;
+}
+.cv-section-intro strong { color: var(--accent); font-weight: 600; }
+[data-theme="dark"] .cv-section-intro strong { text-shadow: 0 0 9px rgba(231,195,130,.32); }
 .cv-icon {
   display: grid; place-items: center; width: 46px; height: 46px; flex: none;
   border-radius: 12px; background: var(--primary-soft); color: var(--primary);
@@ -662,7 +675,7 @@ pre .tok-tag { color: #93c5fd; }
 .cv-icon-logo { background: transparent; }
 .cv-card-text { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
 .cv-card-text strong { color: var(--heading); font-size: 15.5px; }
-.cv-card-text span { color: var(--muted); font-size: 13px; }
+.cv-card-text span { color: var(--muted); font-size: 14px; }
 
 /* sociální sítě — kompaktnější mřížka s brand barvami ikon */
 .cv-grid-socials { grid-template-columns: repeat(3, 1fr); gap: 11px; }

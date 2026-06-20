@@ -61,6 +61,9 @@
     </a>
     <?php endforeach; ?>
   </div>
+  <?php if (!empty($cv['projects_intro'])): ?>
+  <p class="cv-section-intro"><?= $cv['projects_intro'] ?></p>
+  <?php endif; ?>
   <?php endif; ?>
 
   <?php if (!empty($cv['repos'])): $ghUser = $cv['github_user'] ?? '';
