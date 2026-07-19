@@ -5,6 +5,7 @@ CLAUDE.md
 
 # lokální konfigurace se secrets (na produkci vytvoř z cfg.sample.php)
 cfg.php
+private/
 
 # dočasné soubory
 *.tmp

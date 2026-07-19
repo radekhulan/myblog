@@ -59,6 +59,8 @@ const SMTP_USER   = '';
 const SMTP_PASS   = '';
 const SMTP_SECURE = '';                  // '', 'tls' nebo 'ssl'
 const MAIL_FROM   = 'admin@example.com';
+const MAIL_DKIM_SELECTOR = 'mailer';      // DNS: mailer._domainkey.example.com
+const MAIL_DKIM_PRIVATE_KEY = __DIR__ . '/private/dkim/mailer.pem';
 const ADMIN_EMAIL = 'admin@example.com';
 
 // Autor/vývojář zobrazený v horní liště (volitelné; null = nezobrazí se nic)

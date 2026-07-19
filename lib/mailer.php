@@ -35,6 +35,21 @@ function send_mail(string $to, string $subject, string $htmlBody, ?string $reply
 
         $mail->CharSet = 'UTF-8';
         $mail->setFrom(MAIL_FROM, (string) cfg('name'));
+
+        $fromSeparator = strrpos(MAIL_FROM, '@');
+        if (
+            defined('MAIL_DKIM_SELECTOR')
+            && MAIL_DKIM_SELECTOR !== ''
+            && defined('MAIL_DKIM_PRIVATE_KEY')
+            && $fromSeparator !== false
+            && is_readable(MAIL_DKIM_PRIVATE_KEY)
+        ) {
+            $mail->DKIM_domain = substr(MAIL_FROM, $fromSeparator + 1);
+            $mail->DKIM_selector = MAIL_DKIM_SELECTOR;
+            $mail->DKIM_private = MAIL_DKIM_PRIVATE_KEY;
+            $mail->DKIM_identity = MAIL_FROM;
+        }
+
         $mail->addAddress($to);
         if ($replyTo !== null && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
             $mail->addReplyTo($replyTo);
